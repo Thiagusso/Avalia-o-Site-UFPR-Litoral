@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesquisa de Opinião - UFPR Litoral</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ufpr: {
+              blue: '#003366',
+              green: '#006633',
+              light: '#f5f7fa',
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'bounce-slow': 'bounce 2s infinite'
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+      min-height: 100vh;
+    }
+    
+    .rating-option:hover .rating-icon {
+      transform: scale(1.1);
+      transition: all 0.3s ease;
+    }
+    
+    .rating-option.selected .rating-icon {
+      transform: scale(1.2);
+    }
+    
+    .progress-bar {
+      height: 6px;
+      transition: width 0.5s ease;
+    }
+    
+    .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .has-tooltip:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .input-highlight {
+      box-shadow: 0 0 0 2px rgba(0, 99, 102, 0.3);
+    }
+  </style>
+</head>
+<body class="text-gray-800">
+  <div class="container mx-auto px-4 py-10">
+    <!-- Progress indicator -->
+    <div class="max-w-2xl mx-auto mb-8 bg-white rounded-full shadow">
+      <div class="progress-bar bg-ufpr-green rounded-full" style="width: 0%"></div>
+    </div>
+    
+    <!-- Survey Card -->
+    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden animate-fade-in">
+      <!-- Header -->
+      <div class="bg-ufpr-blue text-white py-5 px-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold">Pesquisa de Opinião</h1>
+            <p class="text-ufpr-light opacity-90">Avaliação do site da UFPR Litoral</p>
+          </div>
+          <div class="bg-white rounded-full p-3 text-ufpr-blue">
+            <i class="fas fa-university text-2xl"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Form -->
+      <form id="surveyForm" action="enviar_opiniao.php" method="POST" class="space-y-6 p-6">
+        <!-- Question 1 -->
+        <div class="question" data-step="1">
+          <label class="block text-lg font-semibold mb-3 text-ufpr-blue">
+            <i class="fas fa-user-graduate mr-2"></i> Você é:
+          </label>
+          <select name="publico" required
+                  class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-ufpr-green transition"
+                  onfocus="this.parentNode.classList.add('input-highlight')"
+                  onblur="this.parentNode.classList.remove('input-highlight')">
+            <option value="" disabled selected>Selecione seu perfil</option>
+            <option value="Estudante">Estudante</option>
+            <option value="Servidor(a)">Servidor(a)</option>
+            <option value="Professor(a)">Professor(a)</option>
+            <option value="Comunidade externa">Comunidade externa</option>
+          </select>
+          <p class="text-red-500 text-sm mt-1 hidden">Por favor, selecione uma opção</p>
+        </div>
+        
+        <!-- Question 2 -->
+        <div class="question hidden" data-step="2">
+          <label class="block text-lg font-semibold mb-3 text-ufpr-blue">
+            <i class="fas fa-star mr-2"></i> Como você avalia o site da UFPR Litoral?
+          </label>
+          <div class="grid grid-cols-5 gap-2">
+            <label class="rating-option flex flex-col items-center p-2 rounded-lg cursor-pointer transition hover:bg-gray-50">
+              <input type="radio" name="avaliacao" value="1" class="hidden" required>
+              <div class="rating-icon text-3xl text-red-500 mb-1">
+                <i class="far fa-frown"></i>
+              </div>
+              <span class="text-xs">Ruim</span>
+            </label>
+            <label class="rating-option flex flex-col items-center p-2 rounded-lg cursor-pointer transition hover:bg-gray-50">
+              <input type="radio" name="avaliacao" value="2" class="hidden">
+              <div class="rating-icon text-3xl text-orange-400 mb-1">
+                <i class="far fa-meh"></i>
+              </div>
+              <span class="text-xs">Regular</span>
+            </label>
+            <label class="rating-option flex flex-col items-center p-2 rounded-lg cursor-pointer transition hover:bg-gray-50">
+              <input type="radio" name="avaliacao" value="3" class="hidden">
+              <div class="rating-icon text-3xl text-yellow-400 mb-1">
+                <i class="far fa-smile"></i>
+              </div>
+              <span class="text-xs">Bom</span>
+            </label>
+            <label class="rating-option flex flex-col items-center p-2 rounded-lg cursor-pointer transition hover:bg-gray-50">
+              <input type="radio" name="avaliacao" value="4" class="hidden">
+              <div class="rating-icon text-3xl text-blue-400 mb-1">
+                <i class="far fa-grin"></i>
+              </div>
+              <span class="text-xs">Muito bom</span>
+            </label>
+            <label class="rating-option flex flex-col items-center p-2 rounded-lg cursor-pointer transition hover:bg-gray-50">
+              <input type="radio" name="avaliacao" value="5" class="hidden">
+              <div class="rating-icon text-3xl text-green-500 mb-1">
+                <i class="far fa-grin-stars"></i>
+              </div>
+              <span class="text-xs">Excelente</span>
+            </label>
+          </div>
+          <p class="text-red-500 text-sm mt-1 hidden">Por favor, selecione uma opção</p>
+        </div>
+        
+        <!-- Question 3 -->
+        <div class="question hidden" data-step="3">
+          <label class="block text-lg font-semibold mb-3 text-ufpr-blue">
+            <i class="fas fa-compass mr-2"></i> A navegação no site é fácil?
+          </label>
+          <div class="flex gap-6">
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <div class="relative">
+                <input type="radio" name="navegacao" value="sim" class="hidden peer" required>
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-ufpr-green flex items-center justify-center">
+                  <div class="w-3 h-3 rounded-full bg-ufpr-green hidden peer-checked:block"></div>
+                </div>
+              </div>
+              <span>Sim</span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <div class="relative">
+                <input type="radio" name="navegacao" value="nao" class="hidden peer">
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-ufpr-green flex items-center justify-center">
+                  <div class="w-3 h-3 rounded-full bg-ufpr-green hidden peer-checked:block"></div>
+                </div>
+              </div>
+              <span>Não</span>
+            </label>
+          </div>
+          <p class="text-red-500 text-sm mt-1 hidden">Por favor, selecione uma opção</p>
+        </div>
+        
+        <!-- Question 4 -->
+        <div class="question hidden" data-step="4">
+          <label class="block text-lg font-semibold mb-3 text-ufpr-blue">
+            <i class="fas fa-search mr-2"></i> Você encontra facilmente as informações que procura?
+          </label>
+          <div class="flex gap-6">
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <div class="relative">
+                <input type="radio" name="facilidade_info" value="sim" class="hidden peer" required>
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-ufpr-green flex items-center justify-center">
+                  <div class="w-3 h-3 rounded-full bg-ufpr-green hidden peer-checked:block"></div>
+                </div>
+              </div>
+              <span>Sim</span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <div class="relative">
+                <input type="radio" name="facilidade_info" value="nao" class="hidden peer">
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-ufpr-green flex items-center justify-center">
+                  <div class="w-3 h-3 rounded-full bg-ufpr-green hidden peer-checked:block"></div>
+                </div>
+              </div>
+              <span>Não</span>
+            </label>
+          </div>
+          <p class="text-red-500 text-sm mt-1 hidden">Por favor, selecione uma opção</p>
+        </div>
+        
+        <!-- Question 5 -->
+        <div class="question hidden" data-step="5">
+          <label class="block text-lg font-semibold mb-3 text-ufpr-blue">
+            <i class="fas fa-lightbulb mr-2"></i> Gostaria de sugerir alguma melhoria?
+            <span class="text-sm font-normal text-gray-500">(Opcional)</span>
+          </label>
+          <textarea name="sugestao" rows="3"
+                    class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-ufpr-green transition"
+                    placeholder="Digite suas sugestões aqui..."
+                    onfocus="this.parentNode.classList.add('input-highlight')"
+                    onblur="this.parentNode.classList.remove('input-highlight')"></textarea>
+        </div>
+        
+        <!-- Question 6 -->
+        <div class="question hidden" data-step="6">
+          <label class="inline-flex items-center space-x-3 cursor-pointer">
+            <div class="relative">
+              <input type="checkbox" name="consentimento" value="sim" class="hidden peer" required>
+              <div class="w-6 h-6 rounded border-2 border-gray-300 peer-checked:bg-ufpr-green peer-checked:border-ufpr-green flex items-center justify-center">
+                <i class="fas fa-check text-white text-sm hidden peer-checked:block"></i>
+              </div>
+            </div>
+            <span class="text-gray-700">
+              Autorizo o uso da minha opinião de forma anônima para fins de melhoria do site.
+              <span class="text-red-500">*</span>
+            </span>
+          </label>
+          <p class="text-red-500 text-sm mt-1 hidden">É necessário aceitar os termos para enviar</p>
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between pt-4">
+          <button type="button" id="prevBtn" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition hidden">
+            <i class="fas fa-arrow-left mr-2"></i> Voltar
+          </button>
+          <button type="button" id="nextBtn" class="bg-ufpr-green text-white px-6 py-2 rounded-lg hover:bg-ufpr-blue transition ml-auto">
+            Próximo <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+          <button type="submit" id="submitBtn" class="bg-ufpr-blue text-white px-6 py-2 rounded-lg hover:bg-ufpr-green transition hidden">
+            <i class="fas fa-paper-plane mr-2"></i> Enviar Resposta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('surveyForm');
+      const questions = document.querySelectorAll('.question');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      const progressBar = document.querySelector('.progress-bar');
+      
+      let currentStep = 0;
+      const totalSteps = questions.length;
+      
+      // Initialize form
+      showStep(currentStep);
+      
+      // Next button click handler
+      nextBtn.addEventListener('click', function() {
+        if (validateStep(currentStep)) {
+          currentStep++;
+          showStep(currentStep);
+          updateProgressBar();
+        }
+      });
+      
+      // Previous button click handler
+      prevBtn.addEventListener('click', function() {
+        currentStep--;
+        showStep(currentStep);
+        updateProgressBar();
+      });
+      
+      // Rating option selection handler
+      document.querySelectorAll('.rating-option').forEach(option => {
+        option.addEventListener('click', function() {
+          // Remove selected class from all options
+          document.querySelectorAll('.rating-option').forEach(opt => {
+            opt.classList.remove('selected');
+          });
+          
+          // Add selected class to clicked option
+          this.classList.add('selected');
+          
+          // Trigger the radio button
+          const radio = this.querySelector('input[type="radio"]');
+          radio.checked = true;
+          
+          // Remove error if present
+          const errorMsg = this.closest('.question').querySelector('p.text-red-500');
+          if (errorMsg) {
+            errorMsg.classList.add('hidden');
+          }
+        });
+      });
+      
+      // Show current step and hide others
+      function showStep(step) {
+        questions.forEach((question, index) => {
+          if (index === step) {
+            question.classList.remove('hidden');
+          } else {
+            question.classList.add('hidden');
+          }
+        });
+        
+        // Update button visibility
+        if (step === 0) {
+          prevBtn.classList.add('hidden');
+        } else {
+          prevBtn.classList.remove('hidden');
+        }
+        
+        if (step === totalSteps - 1) {
+          nextBtn.classList.add('hidden');
+          submitBtn.classList.remove('hidden');
+        } else {
+          nextBtn.classList.remove('hidden');
+          submitBtn.classList.add('hidden');
+        }
+      }
+      
+      // Validate current step before proceeding
+      function validateStep(step) {
+        const currentQuestion = questions[step];
+        let isValid = true;
+        
+        // Check required inputs
+        const requiredInputs = currentQuestion.querySelectorAll('[required]');
+        requiredInputs.forEach(input => {
+          if (!input.value && !input.checked) {
+            isValid = false;
+            // Show error message
+            const errorMsg = input.closest('.question').querySelector('p.text-red-500');
+            if (errorMsg) {
+              errorMsg.classList.remove('hidden');
+            }
+            
+            // Highlight the input
+            if (input.type !== 'radio' && input.type !== 'checkbox') {
+              input.classList.add('border-red-500');
+              input.addEventListener('input', function() {
+                this.classList.remove('border-red-500');
+                const errorMsg = this.closest('.question').querySelector('p.text-red-500');
+                if (errorMsg) {
+                  errorMsg.classList.add('hidden');
+                }
+              });
+            }
+          }
+        });
+        
+        return isValid;
+      }
+      
+      // Update progress bar
+      function updateProgressBar() {
+        const progress = ((currentStep + 1) / totalSteps) * 100;
+        progressBar.style.width = `${progress}%`;
+      }
+    });
+  </script>
+</body>
+</html>
